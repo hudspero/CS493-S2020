@@ -6,9 +6,14 @@ const api = require('./api');
 const app = express();
 const port = process.env.PORT || 8000;
 
+const rateLimit = require('./lib/rateLimit')
+
 app.use(morgan('dev'));
 
 app.use(express.json());
+
+app.use(rateLimit)
+
 app.use(express.static('public'));
 
 

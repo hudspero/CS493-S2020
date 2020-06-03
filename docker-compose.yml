@@ -4,4 +4,38 @@ services:
     build: .
     restart: always
     ports:
-        - 8000:8000
+      - 8000:8000
+    environment: 
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_DB: finalProject
+      MYSQL_USER: user
+      MYSQL_PASSWORD: hunter3
+      MYSQL_PORT: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REQUEST_LIMIT_TIME: 60000
+      REQUEST_LIMIT: 5
+
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/mysql
+    environment: 
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: finalProject
+      MYSQL_USER: user
+      MYSQL_PASSWORD: hunter3
+    ports:
+      - 3306:3306
+  
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+
+volumes:
+  db-data:
