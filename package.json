@@ -1,0 +1,31 @@
+{
+  "name": "cs493-team-12-final",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "redis": "^3.0.2"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "api",
+      "lib",
+      "models"
+    ],
+    "exec": "npm run start"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
