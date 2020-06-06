@@ -1,10 +1,29 @@
 const router = require('express').Router();
-const {getCourses, courseSchema, insertCourse, getCourseById, deleteCourseById, updateCrouseById} = require('../models/courses')
+const {getCourses, courseSchema, insertCourse, getCourseById, deleteCourseById, updateCrouseById
+, getEnrollmentByID, enrollStudents, removeStudentsFromCourse} = require('../models/courses')
 const {getInstructorById} = require('../models/users')
 const {validateAgainstSchema, extractValidFields, UpdateValidFields} = require('../lib/validation')
 
 
-
+async function isValidCourseId(req, res, next)
+{
+    let id = parseInt(req.params.id);
+    if(id == NaN)
+    {
+        res.status(404).json({
+            error: "Requested resource " + req.originalUrl + " does not exist"
+          });
+    }
+    let course = await getCourseById(id)
+    if(course == undefined)
+    {
+        res.status(404).json({
+            error: "Requested resource " + req.originalUrl + " does not exist"
+          });
+    }
+    req.course = course;
+    next();
+}
 
 router.get('/', async (req, res, next) =>{
     let query = {};
@@ -52,27 +71,15 @@ router.get('/:id', async (req, res, next) =>{
     res.send(course)
 })
 
-router.patch('/:id', async (req, res, next) =>{
-    let id = parseInt(req.params.id);
-    if(id == NaN)
-    {
-        next();
-        return;
-    }
-    let course = await getCourseById(id)
-    if(course == undefined)
-    {
-        next();
-        return;
-    }
-    let newCourse = UpdateValidFields(req.body, course, courseSchema)
+router.patch('/:id',isValidCourseId, async (req, res, next) =>{
+    let newCourse = UpdateValidFields(req.body, req.course, courseSchema)
     if(await getInstructorById(newCourse.instructorId) == undefined)
     {
         res.status(400).send({error:"invalid instructor"})
         return;
     }
-    course.id = id;
-    if(updateCrouseById(id,course))
+    newCourse.id = req.course.id;
+    if(updateCrouseById(req.course.id,newCourse))
     {
         res.send();
     }
@@ -82,20 +89,8 @@ router.patch('/:id', async (req, res, next) =>{
     }
 })
 
-router.delete('/:id', async (req, res, next) =>{
-    let id = parseInt(req.params.id);
-    if(id == NaN)
-    {
-        next();
-        return;
-    }
-    let course = await getCourseById(id)
-    if(course == undefined)
-    {
-        next();
-        return;
-    }
-    if(deleteCourseById(id))
+router.delete('/:id',isValidCourseId,  async (req, res, next) =>{
+    if(deleteCourseById(req.course.id))
     {
         res.status(204).send();
         return;
@@ -103,12 +98,26 @@ router.delete('/:id', async (req, res, next) =>{
     next();
 })
 
-router.get('/:id/submissions', (req, res, next) =>{
-    res.send({"name":"get:courses/:id/students"})
+router.get('/:id/students',isValidCourseId, async (req, res, next) =>{
+
+    let students = (await getEnrollmentByID(req.course.id)).map(item => item.userId);
+    res.send({course:req.course.id, students:students});
 })
 
-router.post('/:id/submissions', (req, res, next) =>{
-    res.send({"name":"post:courses/:id/students"})
+router.post('/:id/students',isValidCourseId, async (req, res, next) =>{
+    let toAdd = req.body.add || []
+    let toRemove = req.body.remove || []
+    if(!Array.isArray(toAdd) || !Array.isArray(toRemove) || (toAdd.length == 0 && toRemove.length == 0))
+    {
+        res.status(400).send({error:"invalid request body"});
+        return;
+    }
+    if(toAdd.length != 0)
+        await enrollStudents(req.course.id, toAdd);
+    
+    if(toRemove.length != 0)
+        await removeStudentsFromCourse(req.course.id, toRemove);
+    res.status(200).send();
 })
 
 router.get('/:id/roster', (req, res, next) =>{

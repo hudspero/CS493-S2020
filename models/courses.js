@@ -1,4 +1,6 @@
 const {mysqlPool, GenerateWhere} = require('../lib/mysqlPool');
+const mysql = require('mysql2/promise');
+
 
 async function getCoursesCount()
 {
@@ -63,4 +65,38 @@ exports.updateCrouseById = async function(id, course)
     const [result] = await mysqlPool.query(
         'UPDATE course SET ? WHERE id = ?', [course, id]);
         return result.affectedRows == 1;
+}
+
+exports.enrollStudents = async function(courseId, studentIdArray)
+{
+    let values = studentIdArray.map(id => `(${mysql.escape(courseId)},${mysql.escape(id)})`)
+    let sqlStatment ='INSERT IGNORE INTO enrollment VALUES ' + values.join(',');
+    const [result] = await mysqlPool.query(sqlStatment)
+    return result.affectedRows;
+}
+
+exports.removeStudentsFromCourse = async function(courseId, studentIdArray)
+{
+    let idArray = '(' + studentIdArray.map(id => mysql.escape(id)).join(',') + ')';
+    const [result] = await mysqlPool.query(
+    'DELETE FROM enrollment WHERE courseId = ? AND userId in ' + idArray,
+    [courseId]
+    )
+    return result.affectedRows;
+}
+
+exports.getDetailedEnrollmentByID = async function (id)
+{
+    const [result] = await mysqlPool.query(
+    'SELECT * FROM enrollment INNER JOIN users ON enrollment.userId = users.id WHERE courseId = ?',
+    [id])
+    return result;
+}
+
+exports.getEnrollmentByID = async function (id)
+{
+    const [result] = await mysqlPool.query(
+    'SELECT userId FROM enrollment WHERE courseId = ?',
+    [id])
+    return result;
 }
