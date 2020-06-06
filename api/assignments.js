@@ -8,20 +8,39 @@ const {
     getAssignmentSubmissionByAssignmentId
     } = require('../models/assignments');
 
-router.post('/', (req, res, next) =>{
-
+router.post('/', async(req, res, next) =>{
+    if (req.body.courseId && req.body.title && req.body.points && req.body.due) {
+        try{
+            const id = await insertNewAssignment(req.body);
+            res.status(201).send({
+                id: id,
+                links: {
+                  assignment: `/assignments/${id}`
+                }
+            });
+        }catch(err){
+            console.error(err);
+            res.status(500).send({
+                error: "Error inserting assignment into DB.  Please try again later."
+            });
+        }
+    }else{
+        res.status(400).send({
+            error: "Request body is not a valid assignment object"
+        });
+    }
     res.send({"name":"post:assignments/"})
 })
 
-router.get('/:id', (req, res, next) =>{
+router.get('/:id', async(req, res, next) =>{
     id = parseInt(req.params.businessid);
     try {
         const assignment_info = await getAssignmentById(id);
         if (assignment_info){
             res.status(200).send(assignment_info);
-    }else{
-        next();
-    }
+        }else{
+            next();
+        }
     }catch(err){
         console.error(err);
         res.status(500).send({
@@ -31,15 +50,73 @@ router.get('/:id', (req, res, next) =>{
     res.send({"name":"get:assignments/:id"})
 });
 
-router.patch('/:id', (req, res, next) =>{
+router.patch('/:id', async(req, res, next) =>{
+    const assignment = getAssignmentById(req.param.id);
+    if (assignment){
+        if (req.body.courseId || req.body.title || req.body.points || req.body.due) {
+            try{
+                const id = parseInt(req.params.id);
+                const updatesuccessful = await changeAssignment(req.body, id);
+                if (updatesuccessful){
+                    res.status(200).send({
+                        id: id,
+                        links: {
+                          assignment: `/assignments/${id}`
+                        }
+                    });
+                    console.log("update successful");
+                }else{
+                    next();
+                }
+            }catch(err){
+                console.error(err);
+                res.status(500).send({
+                    error: "Error updating assignment in DB.  Please try again later."
+                });
+            }
+        }else{
+            res.status(400).send({
+                error: "Request body is not a valid assignment object"
+            });
+        }
+    }else{
+        res.status(404).send({
+            error: "Can't find Specified assignment"
+        });
+    }
     res.send({"name":"patch:assignments/:id"})
 })
 
-router.delete('/:id', (req, res, next) =>{
+router.delete('/:id', async(req, res, next) =>{
+    const assignment = getAssignmentById(req.param.id);
+    if (assignment){
+        try{
+            const delete_successful = await deleteAssignmentById(req.param.id);
+            console.log(assignment);
+            res.status(204).send();
+        }catch(err){
+            console.error(err);
+            res.status(500).send({
+            error: "Unable to delete assignment."
+            });
+        }
+    }else{
+        res.status(404).send({
+            error: "Can't find Specified assignment"
+        });
+    }
     res.send({"name":"delete:assignments/:id"})
 })
 
-router.get('/:id/submissions', (req, res, next) =>{
+router.get('/:id/submissions', async(req, res, next) =>{
+    const assignment = await getAssignmentById(req.param.id);
+    if (assignment){
+        next();
+    }else{
+        res.status(404).send({
+            error: "Can't find Specified Assignment"
+        });
+    }
     res.send({"name":"get:assignments/:id/submissions"})
 })
 
