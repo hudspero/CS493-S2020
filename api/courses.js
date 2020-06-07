@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const {getCourses, courseSchema, insertCourse, getCourseById, deleteCourseById, updateCrouseById
-, getEnrollmentByID, enrollStudents, removeStudentsFromCourse} = require('../models/courses')
+, getEnrollmentByID, enrollStudents, removeStudentsFromCourse, getDetailedEnrollmentByID
+,getCourseAssignments } = require('../models/courses')
 const {getInstructorById} = require('../models/users')
 const {validateAgainstSchema, extractValidFields, UpdateValidFields} = require('../lib/validation')
 
@@ -120,12 +121,23 @@ router.post('/:id/students',isValidCourseId, async (req, res, next) =>{
     res.status(200).send();
 })
 
-router.get('/:id/roster', (req, res, next) =>{
-    res.send({"name":"get:courses/:id/roster"})
+router.get('/:id/roster', isValidCourseId, async (req, res, next) =>{
+    
+    let students = await getDetailedEnrollmentByID(req.course.id);
+    
+    let filename = `${req.course.number}_${req.course.term}_roster.csv`.replace(/\s/g,'')
+    console.log(filename)
+    res.setHeader('Content-type', "application/octet-stream");
+    res.setHeader(`Content-disposition`, `attachment; filename=${filename}`);
+
+    var text = students.map(student => `${student.userId},${student.name},${student.email}`).join('\n')
+    text = 'id,name,email\n' +text
+    res.send(text)
 })
 
-router.get('/:id/assignments', (req, res, next) =>{
-    res.send({"name":"get:courses/:id/assignments"})
+router.get('/:id/assignments', isValidCourseId, async (req, res, next) =>{
+    let assignments = (await getCourseAssignments(req.course.id)).map(item => item.id);
+    res.send({"assignments":assignments})
 })
 
 module.exports = router;

@@ -100,3 +100,12 @@ exports.getEnrollmentByID = async function (id)
     [id])
     return result;
 }
+
+
+exports.getCourseAssignments = async function(id)
+{
+    const [result] = await mysqlPool.query(
+    'SELECT * FROM assignment WHERE courseid = ?',
+    [id])
+    return result;
+}
