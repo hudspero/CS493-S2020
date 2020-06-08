@@ -1,4 +1,5 @@
 const mysqlPool = require('../lib/mysqlPool');
+const { extractValidFields } = require('../lib/validation');
 
 const AssignmentSchema = {
     courseId: { required: true },
@@ -64,3 +65,23 @@ async function getAssignmentSubmissionByAssignmentId(assignment_id){
     return results;
 }
 exports.getAssignmentSubmissionByAssignmentId = getAssignmentSubmissionByAssignmentId;
+
+
+async function getEnrollmentByCourseIdUserId(coursed_id, user_id){
+    const [ results ] = await mysqlPool.query(
+        'SELECT * FROM enrollment WHERE userId = ? AND courseId = ?',
+        [ user_id, coursed_id ]
+    );
+    return results[0];
+}
+exports.getEnrollmentByCourseIdUserId = getEnrollmentByCourseIdUserId;
+
+
+async function getCoursrByAssignmentId(assign_id){
+    const [ results ] = await mysqlPool.query(
+        'SELECT * FROM courses WHERE id = (SELECT courseId FROM assignments WHERE id = ?)',
+        [ assign_id ]
+    );
+    return results[0];
+}
+exports.getCoursrByAssignmentId = getCoursrByAssignmentId;

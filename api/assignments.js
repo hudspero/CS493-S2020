@@ -5,7 +5,9 @@ const {
     insertNewAssignment,
     changeAssignment,
     deleteAssignmentById,
-    getAssignmentSubmissionByAssignmentId
+    getAssignmentSubmissionByAssignmentId,
+    getEnrollmentByCourseIdUserId,
+    getCoursrByAssignmentId
     } = require('../models/assignments');
 
 router.post('/', async(req, res, next) =>{
@@ -109,9 +111,11 @@ router.delete('/:id', async(req, res, next) =>{
 })
 
 router.get('/:id/submissions', async(req, res, next) =>{
+    const assi_id = parseInt(req.param.id);
     const assignment = await getAssignmentById(req.param.id);
     if (assignment){
-        next();
+        const submissions = await getAssignmentSubmissionByAssignmentId(assi_id);
+        res.status(200).send(submissions);
     }else{
         res.status(404).send({
             error: "Can't find Specified Assignment"
