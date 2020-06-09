@@ -157,7 +157,17 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Jim Marshall','marshallj@unviersity.com','Password1','student'),(2,'Leo Fender','fenderl@university.com','Password2','student'),(3,'Orville Gibson','gibsono@university.com','Password3','student'),(4,'Ikutaro Kakehashi','kakehashii@university.com','Password4','student'),(5,'Christian Martin','martinc@university.com','Password5','instructor'),(6,'Dave Friedman','friedmand@university.com','Password6','instructor'),(7,'Ernie Ball','balle@university.com','Password7','instructor'),(8,'Clifford Cooper','cooperc@university.com','Password8','instructor'),(9,'Thomas Jennings','jenningst@university.com','Password9','admin');
+INSERT INTO `users` VALUES
+  (1,'Jim Marshall','marshallj@university.com','$2a$08$B2XojSeV6VqTgOz80FeZZ.oiOhYLaG5.npq/tCOSz6IFRGii7Ursq','student'),
+  (2,'Leo Fender','fenderl@university.com','$2a$08$V/..fDhFepLsfIroEb95EeFv9eDtK2TZgnalfHmoI43hx8X3xQ.k.','student'),
+  (3,'Orville Gibson','gibsono@university.com','$2a$08$6XIiqOkT6Zo31aWTlVab5O6dEOZUF.j/ssxi82zSe9fkZciJuMXDy','student'),
+  (4,'Ikutaro Kakehashi','kakehashii@university.com','$2a$08$sEu/yvkCKWBEoBWbDhdMfuUAnLDCiMtzGZtV1ToZip5Ne9CKY0beG','student'),
+  (5,'Christian Martin','martinc@university.com','$2a$08$DzXtPWcZdvfXjVOJgfu5WuldlrBAkPGkGl496Q6W0mW/S0m3YZfjq','instructor'),
+  (6,'Dave Friedman','friedmand@university.com','$2a$08$OrgiKUuVBBIVoL8BunNaquwM7FgCE2HvdPpPZeLvJGiwGUBvH0gOS','instructor'),
+  (7,'Ernie Ball','balle@university.com','$2a$08$yjGPC4ZgRuvnnaaKpl6bnua79JYlKPIa8zpzIEIq07S8VM0Z7RRKi','instructor'),
+  (8,'Clifford Cooper','cooperc@university.com','$2a$08$OnzYUqXX0Azb0qxdynSqQeH/mUf4bMpShwHtdNknbdGThT/o.0fUi','instructor'),
+  (9,'Thomas Jennings','jenningst@university.com','$2a$08$l11fkwn4HrfhEW.zrd1EJu2QuWpOQeyXPnvnR7ieh7oFmx9MgV/hC','admin')
+  ;
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
