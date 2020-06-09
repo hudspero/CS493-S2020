@@ -5,7 +5,6 @@ const { generateAuthToken, requireAuth } = require('../lib/auth');
 const { UserSchema, insertNewUser, validateUser, getUserById, getUserByEmail, getCoursesById } = require('../models/users');
 
 router.post('/', requireAuth, async (req, res) =>{
-    //res.send({"name":"post:users/"})
     console.log("Payload info for debugging:", req.role);
     console.log("User Provided:", req.body);
     if (validateAgainstSchema(req.body, UserSchema)) {

@@ -101,7 +101,6 @@ exports.getEnrollmentByID = async function (id)
     return result;
 }
 
-
 exports.getCourseAssignments = async function(id)
 {
     const [result] = await mysqlPool.query(

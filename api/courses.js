@@ -4,7 +4,7 @@ const {getCourses, courseSchema, insertCourse, getCourseById, deleteCourseById, 
 ,getCourseAssignments } = require('../models/courses')
 const {getInstructorById} = require('../models/users')
 const {validateAgainstSchema, extractValidFields, UpdateValidFields} = require('../lib/validation')
-
+const {requireAuth, requireAdmin} = require('../lib/auth')
 
 async function isValidCourseId(req, res, next)
 {
@@ -39,12 +39,21 @@ router.get('/', async (req, res, next) =>{
     res.send(await getCourses(query,req.query.page || 1))
 })
 
-router.post('/', async (req, res, next) =>{
+router.post('/', requireAdmin, async (req, res, next) =>{
     if(!validateAgainstSchema(req.body, courseSchema))
     {
         res.status(400).send({error:"invalid course object"})
         return;
     }
+    if( req.role != 'admin')
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+
+
     let newCourse = extractValidFields(req.body, courseSchema);
     if(await getInstructorById(newCourse.instructorId) == undefined)
     {
@@ -72,7 +81,7 @@ router.get('/:id', async (req, res, next) =>{
     res.send(course)
 })
 
-router.patch('/:id',isValidCourseId, async (req, res, next) =>{
+router.patch('/:id',requireAuth, isValidCourseId, async (req, res, next) =>{
     let newCourse = UpdateValidFields(req.body, req.course, courseSchema)
     if(await getInstructorById(newCourse.instructorId) == undefined)
     {
@@ -80,6 +89,20 @@ router.patch('/:id',isValidCourseId, async (req, res, next) =>{
         return;
     }
     newCourse.id = req.course.id;
+    
+    if(req.role != 'admin')
+    {
+        newCourse.instructorId = req.course.instructorId;
+    }
+
+    if( req.role != 'admin' && req.user != req.course.instructorId)
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+
     if(updateCrouseById(req.course.id,newCourse))
     {
         res.send();
@@ -90,7 +113,9 @@ router.patch('/:id',isValidCourseId, async (req, res, next) =>{
     }
 })
 
-router.delete('/:id',isValidCourseId,  async (req, res, next) =>{
+router.delete('/:id',requireAdmin, isValidCourseId,  async (req, res, next) =>{
+    if(role)
+    
     if(deleteCourseById(req.course.id))
     {
         res.status(204).send();
@@ -99,13 +124,27 @@ router.delete('/:id',isValidCourseId,  async (req, res, next) =>{
     next();
 })
 
-router.get('/:id/students',isValidCourseId, async (req, res, next) =>{
-
+router.get('/:id/students',requireAuth, isValidCourseId, async (req, res, next) =>{
+    if( req.role != 'admin' && req.user != req.course.instructorId)
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+        return;
+    }
     let students = (await getEnrollmentByID(req.course.id)).map(item => item.userId);
     res.send({course:req.course.id, students:students});
 })
 
-router.post('/:id/students',isValidCourseId, async (req, res, next) =>{
+router.post('/:id/students',requireAuth, isValidCourseId, async (req, res, next) =>{
+    if( req.role != 'admin' && req.user != req.course.instructorId)
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+
     let toAdd = req.body.add || []
     let toRemove = req.body.remove || []
     if(!Array.isArray(toAdd) || !Array.isArray(toRemove) || (toAdd.length == 0 && toRemove.length == 0))
@@ -121,8 +160,16 @@ router.post('/:id/students',isValidCourseId, async (req, res, next) =>{
     res.status(200).send();
 })
 
-router.get('/:id/roster', isValidCourseId, async (req, res, next) =>{
+router.get('/:id/roster',requireAuth, isValidCourseId, async (req, res, next) =>{
     
+    if( req.role != 'admin' && req.user != req.course.instructorId)
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+
     let students = await getDetailedEnrollmentByID(req.course.id);
     
     let filename = `${req.course.number}_${req.course.term}_roster.csv`.replace(/\s/g,'')

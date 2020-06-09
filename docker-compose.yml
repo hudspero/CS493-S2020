@@ -15,7 +15,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REQUEST_LIMIT_TIME: 60000
-      REQUEST_LIMIT: 5
+      REQUEST_LIMIT: 10
 
   db:
     image: mysql
@@ -30,12 +30,10 @@ services:
       MYSQL_PASSWORD: hunter3
     ports:
       - 3306:3306
-  
   redis:
     image: redis:latest
     restart: always
     ports:
       - 6379:6379
-
 volumes:
   db-data:
