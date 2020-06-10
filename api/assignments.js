@@ -57,7 +57,7 @@ router.post('/', async(req, res, next) =>{
 })
 
 router.get('/:id', async(req, res, next) =>{
-    id = parseInt(req.params.businessid);
+    id = parseInt(req.params.id);
     try {
         const assignment_info = await getAssignmentById(id);
         if (assignment_info){
