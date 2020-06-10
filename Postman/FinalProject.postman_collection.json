@@ -19,7 +19,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjUsInJvbGUiOiJpbnN0cnVjdG9yIiwiaWF0IjoxNTkxNzM3MDYxLCJleHAiOjE1OTE4MjM0NjF9.ZFN3zAm4C7XNpDlXfX1sWg7IWLCbnUU0AUEjKZ7GtX0",
+											"value": "{{token}}",
 											"type": "string"
 										}
 									]
@@ -27,13 +27,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/users/5",
+									"raw": "{{baseUrl}}/users/16",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
 										"users",
-										"5"
+										"16"
 									]
 								}
 							},
@@ -621,6 +621,301 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "assignment",
+			"item": [
+				{
+					"name": ":id",
+					"item": [
+						{
+							"name": "CreateSubmission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/jason/Desktop/CS493/Final/openapi.ymal"
+										},
+										{
+											"key": "studentId",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:id/submissions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":id",
+										"submissions"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAssignmentSubmissions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:id/submissions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":id",
+										"submissions"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAssigmentById",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:id/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":id",
+										""
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UpdateAssignment",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"courseId\": \"1\",\r\n  \"title\": \"Assignment 2\",\r\n  \"points\": \"100\",\r\n  \"due\": \"2019-06-14T17:00:00-07:00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:id/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":id",
+										""
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DeleteAssignment",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/assignments/:id/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"assignments",
+										":id",
+										""
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a44ffc09-4d02-4c30-a347-c5070c1d8e8e",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4c25db7c-4050-483a-aa48-53142ab03303",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CreateAssignment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courseId\": \"1\",\r\n  \"title\": \"Assignment 3\",\r\n  \"points\": \"100\",\r\n  \"due\": \"2019-06-14T17:00:00-07:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/assignments/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assignments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "65be811d-c161-4624-b645-4e8e7b396ca8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "15688ab5-ec22-4bf8-afff-74c477a5b189",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f45171cb-d444-4eb6-b2c0-d90b991cf5de",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6ef60ffd-73a4-4dfc-92ab-d85f57ab042c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"protocolProfileBehavior": {}
