@@ -154,7 +154,8 @@ router.get('/:id/submissions',requireAuth, async(req, res, next) =>{
 
     if (assignment){
         const submissions = await getAssignmentSubmissionByAssignmentId(assi_id);
-        res.status(200).send(submissions);
+        let toReturn = submissions.map(item => ({...item, fileLink:`/submissions/${item.id}`}));
+        res.status(200).send(toReturn);
     }else{
         res.status(404).send({
             error: "Can't find Specified Assignment"
