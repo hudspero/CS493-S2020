@@ -9,3 +9,14 @@ async function insertNewSubmission(submission)
     return  result.insertId;
 }
 exports.insertNewSubmission = insertNewSubmission;
+
+
+
+async function getSubmissionById(id)
+{
+    const [result] = await mysqlPool.query(
+        'SELECT * FROM submission WHERE id = ?',[id]
+    );
+    return result.count = 1 ? result[0] : undefined;
+}
+exports.getSubmissionById = getSubmissionById;
