@@ -6,9 +6,32 @@ const {
     changeAssignment,
     deleteAssignmentById,
     getAssignmentSubmissionByAssignmentId,
-    getEnrollmentByCourseIdUserId,
-    getCoursrByAssignmentId
+    getEnrollmentByCourseIdUserId
     } = require('../models/assignments');
+
+
+
+const {requireAuth} = require('../lib/auth')
+const {getEnrollmentByID, getCourseById} = require('../models/courses')
+
+
+const crypto = require('crypto');
+const multer = require('multer');
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: `${__dirname}/uploads`,
+        filename: (req, file, callback) => {
+            const randomSeed =
+            crypto.pseudoRandomBytes(8).toString('hex');
+            let extension = file.originalname.split('.').slice(-1)
+            let name = file.originalname.split('.').slice(0,-1).join('.')
+            console.log(name)
+            callback(null, `${name}_${randomSeed}.${extension}`);
+        }
+      })
+});
+
+const {insertNewSubmission} = require('../models/submissions')
 
 router.post('/', async(req, res, next) =>{
     if (req.body.courseId && req.body.title && req.body.points && req.body.due) {
@@ -110,9 +133,25 @@ router.delete('/:id', async(req, res, next) =>{
     res.send({"name":"delete:assignments/:id"})
 })
 
-router.get('/:id/submissions', async(req, res, next) =>{
-    const assi_id = parseInt(req.param.id);
-    const assignment = await getAssignmentById(req.param.id);
+router.get('/:id/submissions',requireAuth, async(req, res, next) =>{
+    const assi_id = parseInt(req.params.id);
+    if(assi_id == NaN)
+    {
+        res.status(404).json({
+            error: "Requested resource " + req.originalUrl + " does not exist"
+          });
+        return;
+    }
+    const assignment = await getAssignmentById(assi_id);
+    const course = await getCourseById(assignment.courseid)
+    if(req.user != course.instructorId && req.role != 'admin')
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+
     if (assignment){
         const submissions = await getAssignmentSubmissionByAssignmentId(assi_id);
         res.status(200).send(submissions);
@@ -121,12 +160,49 @@ router.get('/:id/submissions', async(req, res, next) =>{
             error: "Can't find Specified Assignment"
         });
     }
-    res.send({"name":"get:assignments/:id/submissions"})
 })
 
-router.post('/:id/submissions', (req, res, next) =>{
-    res.send({"name":"post:assignments/:id/submissions"})
-})
+router.post('/:id/submissions',requireAuth, upload.single('file'), async (req, res, next) =>{
+    if(req.role != 'student')
+    {
+        res.status(403).send({
+            error: "Unathorized for action"
+          });
+          return;
+    }
+    if(req.body.studentId != req.user)
+    {
+        res.status(403).send({
+            error: "Unathorized for action: userid and logged in user must match"
+          });
+          return;
+    }
 
+    let id = parseInt(req.params.id);
+    if(id == NaN)
+    {
+        res.status(404).json({
+            error: "Requested resource " + req.originalUrl + " does not exist"
+          });
+    }
+
+    //check student enrolled
+    assignemnt = await getAssignmentById(id)
+    courseEnrollment = await getEnrollmentByID(assignemnt.courseid);
+    if(!courseEnrollment.map(item => item.userId).some(item => item == req.user))
+    {
+        res.status(403).send({
+            error: "Unathorized for action; User not enrolled in class"
+          });
+          return;
+    }
+    let newSubmission = {
+        assignmentid:id,
+        studentid:req.user,
+        filename:req.file.filename
+    }
+    let newSubId = await insertNewSubmission(newSubmission)
+    res.send({"id":newSubId})
+})
 
 module.exports = router;
