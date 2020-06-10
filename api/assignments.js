@@ -54,7 +54,6 @@ router.post('/', async(req, res, next) =>{
             error: "Request body is not a valid assignment object"
         });
     }
-    res.send({"name":"post:assignments/"})
 })
 
 router.get('/:id', async(req, res, next) =>{
@@ -72,7 +71,6 @@ router.get('/:id', async(req, res, next) =>{
             error: "Unable to find assignment."
         });
     }
-    res.send({"name":"get:assignments/:id"})
 });
 
 router.patch('/:id', async(req, res, next) =>{
@@ -109,7 +107,6 @@ router.patch('/:id', async(req, res, next) =>{
             error: "Can't find Specified assignment"
         });
     }
-    res.send({"name":"patch:assignments/:id"})
 })
 
 router.delete('/:id', async(req, res, next) =>{
@@ -130,7 +127,6 @@ router.delete('/:id', async(req, res, next) =>{
             error: "Can't find Specified assignment"
         });
     }
-    res.send({"name":"delete:assignments/:id"})
 })
 
 router.get('/:id/submissions',requireAuth, async(req, res, next) =>{
