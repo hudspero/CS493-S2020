@@ -74,7 +74,7 @@ router.get('/:id', async(req, res, next) =>{
 });
 
 router.patch('/:id', async(req, res, next) =>{
-    const assignment = getAssignmentById(req.param.id);
+    const assignment = await getAssignmentById(req.param.id);
     if (assignment){
         if (req.body.courseId || req.body.title || req.body.points || req.body.due) {
             try{

@@ -24,11 +24,12 @@ exports.getAssignmentById = getAssignmentById;
 // this function to INSERT a new assignment
 async function insertNewAssignment(new_assignment){
     new_assignment = extractValidFields(new_assignment, AssignmentSchema);
+    console.log(new_assignment)
     const [ result ] = await mysqlPool.query(
         'INSERT INTO assignment SET ?',
         new_assignment
     );
-    return result.insert_id;
+    return result.insertId;
 }
 exports.insertNewAssignment = insertNewAssignment;
 
