@@ -114,8 +114,6 @@ router.patch('/:id',requireAuth, isValidCourseId, async (req, res, next) =>{
 })
 
 router.delete('/:id',requireAdmin, isValidCourseId,  async (req, res, next) =>{
-    if(role)
-    
     if(deleteCourseById(req.course.id))
     {
         res.status(204).send();
